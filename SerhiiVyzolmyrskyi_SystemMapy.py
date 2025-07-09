@@ -12,7 +12,10 @@ class Tile:
         return self.terrain_type != "water"
 
 class GameMap:
+    def test(self):
+        print("Test map")
     """Mapa gry jako siatka"""
+
     def __init__(self, width=20, height=20):
         self.width = width
         self.height = height
