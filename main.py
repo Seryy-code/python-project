@@ -1,7 +1,6 @@
 from SerhiiVyzolmyrskyi_SystemMapy import GameMap
 from VladyslavTiutiunyk_SystemZasobów import ResourceManager
-from ViktorSokolov_SystemWalki_Interakcji import CombatSystem
-from AndriiZakordonskyi_SystemJednostek import Human
+from AndriiZakordonskyi_SystemJednostek import Human, Zombie
 
 
 def menu_gamemap(game_map):
@@ -84,42 +83,152 @@ def menu_resource_manager(resource_manager):
         else:
             print("Niewłaściwy wybór. Spróbuj jeszcze raz.")
 
-def menu_combat(combat_system):
-    menu_Combat = True
-    while menu_Combat:
-        print("\n--- Ustawienia combat_system ---")
-        print("1. Test")
-        print("0. Back")
-        choice = input("Twój wybór: ")
-
-        if choice == "1":
-            combat_system.test()
-        elif choice == "0":
-            menu_Combat = False
-        else:
-            print("Niewłaściwy wybór. Spróbuj jeszcze raz.")
-
-def menu_human(human):
+def menu_human(human, game_map, resource_manager):
     menu_Human = True
     while menu_Human:
         print("\n--- Ustawienia human ---")
-        print("1. Test")
+        print("1. Przenieś jednostkę")
+        print("2. Zadaj obrażenia")
+        print("3. Spożyj zasoby")
+        print("4. Zmień rolę")
         print("0. Back")
         choice = input("Twój wybór: ")
 
         if choice == "1":
-            human.test()
+            try:
+                new_x = int(input("Nowe X: "))
+                new_y = int(input("Nowe Y: "))
+                tile = game_map.get_tile(new_x, new_y)
+                if tile is None:
+                    print("Nie ma takiej komórki.")
+                elif tile.terrain_type == "water":
+                    print("Nie możesz wejść do wody!")
+                else:
+                    human.move(new_x, new_y)
+            except Exception as e:
+                print("Błąd wprowadzania:", e)
+        elif choice == "2":
+            try:
+                dmg = int(input("Ile obrażeń zadać: "))
+                human.take_damage(dmg)
+            except Exception as e:
+                print("Błąd wprowadzania:", e)
+        elif choice == "3":
+            food_needed = 1
+            water_needed = 1
+            food_ok = resource_manager.consume_resource("food", food_needed)
+            water_ok = resource_manager.consume_resource("water", water_needed)
+            human.consume_resources(1 if food_ok else 0, 1 if water_ok else 0)
+            if food_ok and water_ok:
+                print("Człowiek spożył zasoby z magazynu.")
+            else:
+                print("Brak zasobów w magazynie! Morale spada.")
+        elif choice == "4":
+            print("Dostępne role: warrior, scavenger, medic, builder, leader")
+            new_role = input("Podaj nową rolę: ")
+            human.role = new_role
+            print(f"Rola zmieniona na: {human.role}")
         elif choice == "0":
             menu_Human = False
         else:
             print("Niewłaściwy wybór. Spróbuj jeszcze raz.")
 
+def menu_units(units, game_map, resource_manager):
+    while True:
+        print("\n--- Zarządzanie jednostkami ---")
+        print("1. Wybierz jednostkę po współrzędnych")
+        print("0. Powrót")
+        choice = input("Twój wybór: ")
+
+        if choice == "1":
+            try:
+                x = int(input("Podaj X jednostki: "))
+                y = int(input("Podaj Y jednostki: "))
+                found = None
+                for unit in units:
+                    if unit.x == x and unit.y == y:
+                        found = unit
+                        break
+                if not found:
+                    print("Nie znaleziono jednostki na tych współrzędnych.")
+                    continue
+
+                print(f"Wybrano: {'Człowiek' if isinstance(found, Human) else 'Zombie'} na ({found.x}, {found.y})")
+                print("1. Przenieś jednostkę")
+                if isinstance(found, Human):
+                    print("2. Zadaj obrażenia")
+                    print("3. Spożyj zasoby")
+                    print("4. Zmień rolę")
+                print("0. Powrót")
+                sub_choice = input("Twój wybór: ")
+                if sub_choice == "1":
+                    new_x = int(input("Nowe X: "))
+                    new_y = int(input("Nowe Y: "))
+                    tile = game_map.get_tile(new_x, new_y)
+                    if tile is None:
+                        print("Nie ma takiej komórki.")
+                    elif tile.terrain_type == "water":
+                        print("Nie możesz wejść do wody!")
+                    else:
+                        other = None
+                        for unit in units:
+                            if unit != found and unit.x == new_x and unit.y == new_y:
+                                other = unit
+                                break
+                        prev_x, prev_y = found.x, found.y
+                        found.move(new_x, new_y)
+                        if other:
+                            if isinstance(found, Human) and isinstance(other, Zombie):
+                                print("Zombie atakuje człowieka!")
+                                found.take_damage(20)
+                                if found.hp > 0:
+                                    other.move(prev_x, prev_y)
+                            elif isinstance(found, Zombie) and isinstance(other, Human):
+                                print("Zombie atakuje człowieka!")
+                                other.take_damage(20)
+                                if other.hp > 0:
+                                    found.move(prev_x, prev_y)
+                elif sub_choice == "2" and isinstance(found, Human):
+                    try:
+                        dmg = int(input("Ile obrażeń zadać: "))
+                        found.take_damage(dmg)
+                    except Exception as e:
+                        print("Błąd wprowadzania:", e)
+                elif sub_choice == "3" and isinstance(found, Human):
+                    food_needed = 1
+                    water_needed = 1
+                    food_ok = resource_manager.consume_resource("food", food_needed)
+                    water_ok = resource_manager.consume_resource("water", water_needed)
+                    found.consume_resources(1 if food_ok else 0, 1 if water_ok else 0)
+                    if food_ok and water_ok:
+                        print("Człowiek spożył zasoby z magazynu.")
+                    else:
+                        print("Brak zasobów w magazynie! Morale spada.")
+                elif sub_choice == "4" and isinstance(found, Human):
+                    print("Dostępne role: warrior, scavenger, medic, builder, leader")
+                    new_role = input("Podaj nową rolę: ")
+                    found.role = new_role
+                    print(f"Rola zmieniona na: {found.role}")
+                elif sub_choice == "0":
+                    continue
+                else:
+                    print("Niewłaściwy wybór.")
+            except Exception as e:
+                print("Błąd:", e)
+        elif choice == "0":
+            break
+        else:
+            print("Niewłaściwy wybór. Spróbuj jeszcze raz.")
+
 def main():
     game_map = GameMap()
-    # game_map.generate_terrain()
+    game_map.generate_terrain()
     resource_manager = ResourceManager()
-    combat_system = CombatSystem()
-    human = Human(0, 0)
+    human1 = Human(0, 0, "warrior")
+    human2 = Human(2, 2, "medic")
+    zombie1 = Zombie(1, 1, "runner")
+    zombie2 = Zombie(3, 3, "normal")
+    units = [human1, human2, zombie1, zombie2]
 
 
     while True:
@@ -134,10 +243,8 @@ def main():
             menu_gamemap(game_map)
         elif choice == "2":
             menu_resource_manager(resource_manager)
-        elif choice == "3":
-            menu_combat(combat_system)
         elif choice == "4":
-            menu_human(human)
+            menu_units(units, game_map, resource_manager)
         elif choice == "0":
             print("Exit.")
             break

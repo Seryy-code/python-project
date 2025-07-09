@@ -2,40 +2,44 @@
 class Entity:
     """Bazowa klasa dla wszystkich jednostek w grze"""
     def __init__(self, x, y, hp):
-        # TODO: Zaimplementuj konstruktor
-        pass
+        self.x = x
+        self.y = y
+        self.hp = hp
 
     def move(self, new_x, new_y):
-        # TODO: Zmień pozycję jednostki
-        pass
+        self.x = new_x
+        self.y = new_y
+        print(f"Jednostka przeniesiona na ({self.x}, {self.y})")
 
     def take_damage(self, damage):
-        # TODO: Obsłuż otrzymywanie obrażeń
-        pass
+        self.hp -= damage
+        print(f"Jednostka otrzymała {damage} obrażeń, HP: {self.hp}")
+        if self.hp <= 0:
+            print("Jednostka nie żyje!")
 
 class Human(Entity):
-    def test(self):
-        print("Test Human")
     """Klasa reprezentująca człowieka"""
     def __init__(self, x, y, role="survivor"):
-        # TODO: Zainicjuj człowieka z HP=100, morale=85
-        # role może być: "warrior", "scavenger", "medic", "builder", "leader"
-        pass
+        super().__init__(x, y, 100)
+        self.morale = 85
+        self.role = role  # "warrior", "scavenger", "medic", "builder", "leader"
 
     def consume_resources(self, food, water):
-        # TODO: Konsumuj zasoby, zmniejsz morale jeśli brak
-        pass
+        if food > 0 and water > 0:
+            print("Człowiek spożył zasoby.")
+        else:
+            self.morale -= 10
+            print("Brak zasobów! Morale spada do:", self.morale)
 
 class Zombie(Entity):
     """Klasa reprezentująca zombie"""
     def __init__(self, x, y, zombie_type="normal"):
-        # TODO: Zainicjuj zombie z HP=50
-        # zombie_type może być: "normal", "walker", "runner", "howler"
-        pass
+        super().__init__(x, y, 50)
+        self.zombie_type = zombie_type
+        self.alive = True
 
     def can_infect(self):
-        # TODO: Zwróć True jeśli zombie może zarazić (np. jest żywe)
-        pass
+        return self.alive
 
 # Testy do wykonania:
 # 1. Stwórz 3 ludzi o różnych rolach
