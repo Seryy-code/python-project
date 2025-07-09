@@ -1,6 +1,8 @@
 import random
 
 class CombatSystem:
+    def test(self):
+        print("Test CombatSystem")
     def __init__(self):
         self.battle_history = []
 

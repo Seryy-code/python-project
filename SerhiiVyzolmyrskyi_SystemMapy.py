@@ -11,7 +11,10 @@ class Tile:
         pass
 
 class GameMap:
+    def test(self):
+        print("Test map")
     """Mapa gry jako siatka"""
+
     def __init__(self, width=20, height=20):
         # TODO: Stwórz siatkę Tile'ów
         pass

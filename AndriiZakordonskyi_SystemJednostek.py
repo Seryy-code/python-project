@@ -14,6 +14,8 @@ class Entity:
         pass
 
 class Human(Entity):
+    def test(self):
+        print("Test Human")
     """Klasa reprezentująca człowieka"""
     def __init__(self, x, y, role="survivor"):
         # TODO: Zainicjuj człowieka z HP=100, morale=85
