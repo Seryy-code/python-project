@@ -1,45 +1,52 @@
 class Resource:
     """Klasa reprezentująca zasób"""
     def __init__(self, name, quantity):
-        # TODO: Zaimplementuj konstruktor
-        pass
+        self.name = name
+        self.quantity = quantity
 
     def consume(self, amount):
-        # TODO: Zmniejsz ilość zasobu, zwróć True jeśli się udało
-        pass
+        # Zmniejsz ilość zasobu, zwróć True jeśli się udało
+        if self.quantity >= amount:
+            self.quantity -= amount
+            return True
+        return False
 
     def add(self, amount):
-        # TODO: Dodaj zasoby
-        pass
+        # Dodaj zasoby
+        self.quantity += amount
 
 class ResourceManager:
-    def test(self):
-        print("Test ResourceManager")
     """Manager zarządzający wszystkimi zasobami w grze"""
     def __init__(self):
-        # TODO: Stwórz słownik zasobów
-        # Podstawowe zasoby: food, water, medicine, ammo, materials
-        pass
+        # Stwórz słownik zasobów
+        self.resources = {
+            "food": Resource("food", 100),
+            "water": Resource("water", 100),
+            "medicine": Resource("medicine", 20),
+            "ammo": Resource("ammo", 50),
+            "materials": Resource("materials", 30)
+        }
 
     def add_resource(self, resource_type, amount):
-        # TODO: Dodaj zasób do puli
-        pass
+        # Dodaj zasób do puli
+        if resource_type in self.resources:
+            self.resources[resource_type].add(amount)
+        else:
+            self.resources[resource_type] = Resource(resource_type, amount)
 
     def consume_resource(self, resource_type, amount):
-        # TODO: Spróbuj użyć zasobu, zwróć True/False
-        pass
+        # Spróbuj użyć zasobu, zwróć True/False
+        if resource_type in self.resources:
+            return self.resources[resource_type].consume(amount)
+        return False
 
     def get_status(self):
-        # TODO: Zwróć słownik z aktualnym stanem zasobów
-        pass
+        # Zwróć słownik z aktualnym stanem zasobów
+        return {name: res.quantity for name, res in self.resources.items()}
 
     def daily_consumption(self, population):
-        # TODO: Oblicz i zastosuj dzienne zużycie zasobów
-        # 1 człowiek = 2 food, 3 water dziennie
-        pass
-
-# Testy do wykonania:
-# 1. Stwórz manager z początkowymi zasobami
-# 2. Symuluj 5 dni konsumpcji dla 10 osób
-# 3. Dodaj znalezione zasoby
-# 4. Wyświetl raport o stanie zasobów
+        # Oblicz i zastosuj dzienne zużycie zasobów
+        food_needed = 2 * population
+        water_needed = 3 * population
+        self.consume_resource("food", food_needed)
+        self.consume_resource("water", water_needed)
