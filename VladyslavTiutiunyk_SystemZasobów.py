@@ -13,6 +13,8 @@ class Resource:
         pass
 
 class ResourceManager:
+    def test(self):
+        print("Test ResourceManager")
     """Manager zarządzający wszystkimi zasobami w grze"""
     def __init__(self):
         # TODO: Stwórz słownik zasobów
