@@ -54,12 +54,31 @@ def menu_resource_manager(resource_manager):
     menu_ResourceManager = True
     while menu_ResourceManager:
         print("\n--- Ustawienia resource_manager ---")
-        print("1. Test")
+        print("1. Pokaż stan zasobów")
+        print("2. Dodać zasób")
+        print("3. Korzystać z zasobu")
+        print("4. Simułować dzień dla mieszkańców")
         print("0. Back")
         choice = input("Twój wybór: ")
 
         if choice == "1":
-            resource_manager.test()
+            print(resource_manager.get_status())
+        elif choice == "2":
+            rtype = input("Typ zasobu: ")
+            amount = int(input("Ile dodać: "))
+            resource_manager.add_resource(rtype, amount)
+            print("Dodane.")
+        elif choice == "3":
+            rtype = input("Typ zasobu: ")
+            amount = int(input("Ile użyć: "))
+            if resource_manager.consume_resource(rtype, amount):
+                print("Używane.")
+            else:
+                print("Brak zasobów.")
+        elif choice == "4":
+            pop = int(input("Wprowadź liczbę osób: "))
+            resource_manager.daily_consumption(pop)
+            print("Zasoby uaktualnione.")
         elif choice == "0":
             menu_ResourceManager = False
         else:
